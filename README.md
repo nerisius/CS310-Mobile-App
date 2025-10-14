@@ -3,6 +3,7 @@
 A reading tracker with an e-reader, developed in Flutter for mobile.
 
 #Description:
+
 Readers often have to use multiple applications for tracking their reading progress, discovering new books, and reading e-books. This fragmented experience lacks integration and personalization.
 Bookmate solves this by combining these features into a single, seamless application. 
 
@@ -10,6 +11,7 @@ Bookmate combines the functionality of a reading tracker with a fully featured e
 
 
 #Core Feaatures:
+
 • User registration & login system 
 
 • Reading history tracking 
