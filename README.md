@@ -1,1 +1,1 @@
-# CS310-Mobile-App
+# Goodreads with e-reader
