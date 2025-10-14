@@ -10,10 +10,15 @@ Bookmate combines the functionality of a reading tracker with a fully featured e
 
 #Core Feaatures:
 • User registration & login system 
+
 • Reading history tracking 
+
 • Custom book lists (“To Read”, “Favourites” etc.) 
+
 • User reviews 
+
 • Integrated e-reader 
+
 • User-created personal digital library 
 
 
