@@ -2,15 +2,16 @@
 
 A reading tracker with an e-reader, developed in Flutter for mobile.
 
-#Description:
+# Description:
 
 Readers often have to use multiple applications for tracking their reading progress, discovering new books, and reading e-books. This fragmented experience lacks integration and personalization.
-Bookmate solves this by combining these features into a single, seamless application. 
+Bookmate solves this by combining these features into a single, seamless and personalized application. 
 
-Bookmate combines the functionality of a reading tracker with a fully featured e-reader. Users can maintain personal reading histories, create custom book lists such as “To Read” or “Favourites,” keep track of their reading habits and trends and write reviews or thoughts on the books they've read. Additionally, an integrated EPUB and PDF reader allows users to import their e-books to the application and build a custom library. Features like text selecting, bookmarking and highlighting are avaliable in the application.
+Bookmate integrates a reading tracker with a fully featured e-reader. Users can maintain personal reading histories, create custom book lists (like “To Read” or “Favourites”), track reading habits and trends, and write personal reviews or reflections on the books they've read.
 
+The app also includes a built-in EPUB and PDF reader, allowing users to import and organize their e-books into a custom digital library. Additional features such as text selection, bookmarking, and highlighting enhance the reading experience.
 
-#Core Feaatures:
+# Core Feaatures:
 
 • User registration & login system 
 
@@ -18,11 +19,15 @@ Bookmate combines the functionality of a reading tracker with a fully featured e
 
 • Custom book lists (“To Read”, “Favourites” etc.) 
 
-• User reviews 
+• User reviews and notes
 
-• Integrated e-reader 
+• Integrated EBUP/PDF e-reader 
 
-• User-created personal digital library 
+• Personal digital library management 
+
+• Text selection, highlighting, and bookmarking 
+
+
 
 
 
