@@ -11,21 +11,23 @@ Bookmate integrates a reading tracker with a fully featured e-reader. Users can 
 
 The app also includes a built-in EPUB and PDF reader, allowing users to import and organize their e-books into a custom digital library. Additional features such as text selection, bookmarking, and highlighting enhance the reading experience.
 
-# Core Feaatures:
+# Core Features:
 
 • User registration & login system 
-
 • Reading history tracking 
-
 • Custom book lists (“To Read”, “Favourites” etc.) 
-
 • User reviews and notes
-
 • Integrated EBUP/PDF e-reader 
-
 • Personal digital library management 
-
 • Text selection, highlighting, and bookmarking 
+
+# Team Members:
+
+Zeynep Menekşe - 34046
+Zeyneb Neris Yılmaz - 32684
+Mert Danacı - 32099
+Sait Kaçmaz - 32062
+Ahmet Ertekin - 32094
 
 
 
