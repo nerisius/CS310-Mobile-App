@@ -30,15 +30,15 @@ The app also includes a built-in EPUB and PDF reader, allowing users to import a
 
 # Team Members:
 
-Zeynep Menekşe - 34046
+Zeynep Menekşe - 34046 - Presentation & Communication Lead 
 
-Zeyneb Neris Yılmaz - 32684
+Zeyneb Neris Yılmaz - 32684 - Documentation & Submission Lead
 
-Mert Danacı - 32099
+Mert Danacı - 32099 - Project Coordinator
 
-Sait Kaçmaz - 32062
+Sait Kaçmaz - 32062 - Integration & Repository Lead
 
-Ahmet Ertekin - 32094
+Ahmet Ertekin - 32094 - Testing & Quality Assurance Lead
 
 
 
