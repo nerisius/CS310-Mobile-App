@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         '/decider': (context) => const DeciderScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
-        'signup' : (context) => const SignScreen(),
+        '/signup' : (context) => const SignScreen(),
         '/home': (context) => const HomeScreen(),
       },
     );
