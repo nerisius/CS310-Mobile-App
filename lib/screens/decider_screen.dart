@@ -39,9 +39,4 @@ class _DeciderScreenState extends State<DeciderScreen> {
   }
 }
 
-class OnboardingScreen extends StatefulWidget{
-  const OnboardingScreen({super.key});
-  @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
 
-}
