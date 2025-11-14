@@ -7,8 +7,15 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Home")),
-      body: const Center(
-        child: Text("Welcome to Home Screen!"),
+      body: Center(
+        child:Column(
+          children: [
+            Text(
+            "Welcome to Home Screen!"),
+            ElevatedButton(onPressed: () => Navigator.pushNamed(context, '/login'),
+                child: Text('log out')),
+          ]
+        ),
       ),
     );
   }
