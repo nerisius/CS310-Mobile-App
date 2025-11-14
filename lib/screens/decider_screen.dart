@@ -12,25 +12,36 @@ class _DeciderScreenState extends State<DeciderScreen> {
   @override
   void initState() {
     super.initState();
-    _decideNextScreen();
+    _decideRoute();
   }
 
-  Future<void> _decideNextScreen() async {
+  Future<void> _decideRoute() async {
+    // Simulate loading preferences
     final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool("seenOnboarding") ?? false;
+    final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    if (hasSeenOnboarding) {
+    if (isFirstTime) {
+      prefs.setBool('isFirstTime', false);
+      Navigator.pushReplacementNamed(context, '/onboarding');
+    } else if (!isLoggedIn) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      Navigator.pushReplacementNamed(context, '/onboarding');
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Temporary loading screen while checking SharedPreferences
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
     );
   }
+}
+
+class OnboardingScreen extends StatefulWidget{
+  const OnboardingScreen({super.key});
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+
 }
