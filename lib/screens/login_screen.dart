@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _userController,
                   decoration: InputDecoration(
                     labelText: "Email or Username",
-                    labelStyle: AppTextStyles.label,
+                    labelStyle: TextStyle(color: Colors.black45),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: AppColors.textFieldBorder),
                       borderRadius: BorderRadius.circular(12),
@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: "Password",
-                    labelStyle: AppTextStyles.label,
+                    labelStyle: TextStyle(color: Colors.black45),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: AppColors.textFieldBorder),
                       borderRadius: BorderRadius.circular(12),
