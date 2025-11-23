@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,12 +24,20 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BookMate'),
+        backgroundColor: AppColors.accent,
+        title: const Text(
+          'BookMate',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {
-              // Later: navigate to Profile
+              // Later: navigate to Notifications
             },
           ),
         ],
@@ -46,9 +55,9 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: ListTile(
-              leading: const CircleAvatar(
-                backgroundColor: Colors.deepPurple,
-                child: Icon(Icons.person, color: Colors.white),
+              leading: CircleAvatar(
+                backgroundColor: AppColors.accent,
+                child: const Icon(Icons.person, color: Colors.white),
               ),
               title: Text(post['user']!, style: const TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(post['activity']!),
@@ -70,20 +79,8 @@ class HomeScreen extends StatelessWidget {
         onPressed: () {
           // Later: navigate to "Add Post" screen
         },
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.add),
-      ),
-
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Library'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+        backgroundColor: AppColors.accent,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
