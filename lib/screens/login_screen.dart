@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:bookmate/utils/login_styling.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_colors.dart';
+import '../utils/app_text_styles.dart';
+import '../utils/app_spacing.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: AppPaddings.screen,
+          padding: AppSpacing.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   value == null || value.isEmpty ? "This field is required" : null,
                 ),
 
-                AppPaddings.fieldSpacing,
+                AppSpacing.fieldSpacing,
 
                 // Password field
                 TextFormField(
@@ -84,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   value == null || value.isEmpty ? "Password is required" : null,
                 ),
 
-                AppPaddings.buttonSpacing,
+                AppSpacing.buttonSpacing,
 
                 // Login button
                 SizedBox(
