@@ -1,0 +1,9 @@
+Fix Flutter web compilation issues:
+
+1. **Add missing `/settings` route** to main.dart routes configuration
+2. **Fix SharedPreferences web compatibility** in settings_screen.dart (add platform checks or alternative approach)
+3. **Correct import paths** in profile_screen.dart 
+4. **Verify SearchScreen implementation** and ensure it's properly integrated
+
+After these fixes, the app should compile and run successfully with `flutter run -d chrome
+before doing all these , first run to see compile and runtime errors
