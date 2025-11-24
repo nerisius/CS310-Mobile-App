@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import 'favourite_books_screen.dart';
 
-/// Sizde zaten Book modeli varsa bunu silip kendi modelinizi kullanın.
+/// book model
 class BookItem {
   final String title;
   final String author;
@@ -17,7 +17,7 @@ class BookItem {
   });
 }
 
-/// Rosette/Badge modeli (dummy)
+/// Rosette/Badge modeli 
 class RosetteItem {
   final String title;
   final IconData icon;
@@ -291,7 +291,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-/// ====== UI helpers (Library style) ======
+/// UI helpers  
 
 class _Card extends StatelessWidget {
   final Widget child;
