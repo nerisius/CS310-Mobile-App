@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'stats/stats_screen.dart';
 import '../utils/app_colors.dart';
+import 'library_screen.dart';
+import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,12 +18,11 @@ class _MainScreenState extends State<MainScreen> {
   // List of screens for each tab
   final List<Widget> _screens = [
     const HomeScreen(),
-    const PlaceholderScreen(title: 'Library'),
+    const LibraryScreen(), 
     const PlaceholderScreen(title: 'Search'),
     const StatsScreen(),
-    const PlaceholderScreen(title: 'Profile'),
+    const ProfileScreen(), 
   ];
-
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
