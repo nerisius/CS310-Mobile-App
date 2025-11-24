@@ -2,15 +2,36 @@
 
 A Flutter mobile application for book tracking and social reading. Users can share their reading progress, discover what others are reading, and maintain their personal book library.
 
-**Course Project:** CS310 - Step 2
+**Course Project:** CS310 - Phase 2.2
 **Tech Stack:** Flutter, Dart
 
 ## Current Features
 
-- User onboarding flow for first-time users
-- Authentication screens (login and signup)
-- Social feed displaying reading activities
-- Navigation system with bottom tab bar (Home, Library, Search, Stats, Profile)
+### Authentication & Onboarding
+- User onboarding flow with 5 feature introduction screens
+- Login screen with form validation
+- Sign up screen with comprehensive user registration
+- Persistent login state management
+
+### Main Navigation (Bottom Tab Bar)
+- **Home Tab**: Social feed displaying reading activities and posts
+- **Library Tab**: Personal book collection with progress tracking
+- **Search Tab**: Search books by title or author with real-time filtering
+- **Stats Tab**: Reading statistics with interactive charts
+- **Profile Tab**: User profile with rosettes, favourite books, and reading goals
+
+### Profile Features
+- User profile display with bio and stats
+- Rosettes/achievements system
+- Favourite books showcase
+- Reading statistics (Read History, Currently Reading, Want to Read)
+- Monthly reading goal tracker
+- Settings integration
+
+### Additional Screens
+- Settings screen with account, notifications, privacy, and support options
+- Favourite books detail screen
+- Logout functionality
 
 **Note:** Authentication is currently mock implementation. Backend integration is pending.
 
@@ -106,45 +127,72 @@ flutter test test/widget_test.dart
 
 ```
 lib/
-├── main.dart                    # App entry point and route configuration
-├── screens/                     # All UI screens
-│   ├── decider_screen.dart     # Initial router (decides onboarding/login/home)
-│   ├── onboarding_screen.dart  # Multi-page onboarding
-│   ├── login_screen.dart       # Login form
-│   ├── signup.dart             # Registration form
-│   └── home_screen.dart        # Main feed
-└── utils/                       # Shared resources
-    ├── login_styling.dart      # App-wide colors, text styles, spacing
-    ├── circular_logo.png
-    ├── MomoSignature-Regular.ttf
-    └── Inter-VariableFont_opsz,wght.ttf
+├── main.dart                          # App entry point and route configuration
+├── models/                            # Data models
+│   └── book_item.dart                 # Book model used across the app
+├── screens/                           # All UI screens
+│   ├── decider_screen.dart            # Initial router (decides onboarding/login/home)
+│   ├── onboarding_screen.dart         # Multi-page onboarding (5 screens)
+│   ├── login_screen.dart              # Login form with validation
+│   ├── signup.dart                    # Registration form
+│   ├── main_screen.dart               # Main container with bottom navigation
+│   ├── home_screen.dart               # Social feed with posts
+│   ├── library_screen.dart            # Personal book library
+│   ├── search_screen.dart             # Book search functionality
+│   ├── profile_screen.dart            # User profile with rosettes & stats
+│   ├── favourite_books_screen.dart    # Favourite books grid view
+│   ├── settings_screen.dart           # App settings and preferences
+│   └── stats/
+│       └── stats_screen.dart          # Reading statistics with charts
+└── utils/                             # Shared resources
+    ├── app_colors.dart                # App-wide color definitions
+    ├── app_text_styles.dart           # Text style definitions
+    ├── login_styling.dart             # Login screen styling
+    ├── circular_logo.png              # App logo asset
+    ├── MomoSignature-Regular.ttf      # Custom font
+    └── Inter-VariableFont_opsz,wght.ttf  # Inter font family
 ```
 
 ## Application Flow
 
 1. **App Launch** → DeciderScreen checks user state via SharedPreferences
-2. **First-time user** → OnboardingScreen (6 pages) → LoginScreen
-3. **Returning user (not logged in)** → LoginScreen → HomeScreen
-4. **Logged-in user** → HomeScreen directly
+2. **First-time user** → OnboardingScreen (5 feature screens) → LoginScreen
+3. **Returning user (not logged in)** → LoginScreen → MainScreen
+4. **Logged-in user** → MainScreen directly (with bottom navigation)
 
-Users can navigate to SignupScreen from LoginScreen.
+### Navigation Structure
+- Users can navigate to SignupScreen from LoginScreen
+- MainScreen provides bottom tab navigation to: Home, Library, Search, Stats, Profile
+- Profile screen provides access to Settings screen
+- Settings screen includes logout functionality
 
 ## Key Dependencies
 
-- `shared_preferences: ^2.2.2` - Local storage for user preferences
+- `shared_preferences: ^2.2.2` - Local storage for user preferences and authentication state
 - `cupertino_icons: ^1.0.8` - iOS-style icons
+- `fl_chart: ^0.69.0` - Interactive charts for statistics visualization
 
 ## Development Notes
 
 ### Current State
 - Mock authentication (accepts any credentials)
-- Hardcoded sample data in social feed
-- Bottom navigation tabs are placeholders
-- No backend API integration
+- Sample data for books, posts, and user stats
+- Functional UI with navigation between all screens
+- Form validation on login and signup screens
+- Search functionality with real-time filtering
+- Reading statistics with charts and progress tracking
+- No backend API integration yet
 
 ### Shared Preferences Keys
 - `isFirstTime` - Boolean tracking onboarding completion
 - `isLoggedIn` - Boolean tracking authentication state
+
+### Recent Updates
+- Added search screen with book filtering functionality
+- Integrated fl_chart for statistics visualization
+- Fixed settings navigation from profile page
+- Created shared BookItem model for consistency
+- Implemented favourite books grid view
 
 ## Code Quality
 
