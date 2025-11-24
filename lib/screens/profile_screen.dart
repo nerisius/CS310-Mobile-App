@@ -76,9 +76,8 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: AppColors.accent),
-            onPressed: () {
-              // TODO: settings route
-              // Navigator.pushNamed(context, "/settings");
+            onPressed: () { 
+              Navigator.pushNamed(context, "/settings");
             },
           ),
         ],
