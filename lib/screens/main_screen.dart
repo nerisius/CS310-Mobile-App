@@ -4,6 +4,8 @@ import 'stats/stats_screen.dart';
 import '../utils/app_colors.dart';
 import 'library_screen.dart';
 import 'profile_screen.dart';
+import 'search_screen.dart';
+import '../models/book_item.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,13 +17,53 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
+  // Sample books for search screen
+  final List<BookItem> _sampleBooks = [
+    BookItem(
+      title: 'The Midnight Library',
+      author: 'Matt Haig',
+      filePath: 'path1',
+      coverUrl: 'https://covers.openlibrary.org/b/id/10909258-L.jpg',
+    ),
+    BookItem(
+      title: 'Atomic Habits',
+      author: 'James Clear',
+      filePath: 'path2',
+      coverUrl: 'https://covers.openlibrary.org/b/id/10677662-L.jpg',
+    ),
+    BookItem(
+      title: 'Dune',
+      author: 'Frank Herbert',
+      filePath: 'path3',
+      coverUrl: 'https://covers.openlibrary.org/b/id/12583597-L.jpg',
+    ),
+    BookItem(
+      title: 'Sapiens',
+      author: 'Yuval Noah Harari',
+      filePath: 'path4',
+      coverUrl: 'https://covers.openlibrary.org/b/id/8503016-L.jpg',
+    ),
+    BookItem(
+      title: '1984',
+      author: 'George Orwell',
+      filePath: 'path5',
+      coverUrl: 'https://covers.openlibrary.org/b/id/7222246-L.jpg',
+    ),
+    BookItem(
+      title: 'To Kill a Mockingbird',
+      author: 'Harper Lee',
+      filePath: 'path6',
+      coverUrl: 'https://covers.openlibrary.org/b/id/8228691-L.jpg',
+    ),
+  ];
+
   // List of screens for each tab
-  final List<Widget> _screens = [
+  late final List<Widget> _screens = [
     const HomeScreen(),
-    const LibraryScreen(), 
-    const PlaceholderScreen(title: 'Search'),
+    const LibraryScreen(),
+    SearchScreen(books: _sampleBooks),
     const StatsScreen(),
-    const ProfileScreen(), 
+    const ProfileScreen(),
   ];
   void _onTabTapped(int index) {
     setState(() {

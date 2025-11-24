@@ -1,21 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 import 'favourite_books_screen.dart';
-
-/// book model
-class BookItem {
-  final String title;
-  final String author;
-  final String? coverUrl;
-  final String filePath;
-
-  BookItem({
-    required this.title,
-    required this.author,
-    required this.filePath,
-    this.coverUrl,
-  });
-}
+import '../models/book_item.dart';
 
 /// Rosette/Badge modeli 
 class RosetteItem {

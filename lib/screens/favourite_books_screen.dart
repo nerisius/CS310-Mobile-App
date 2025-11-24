@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
-import 'profile_screen.dart';
+import '../models/book_item.dart';
 
 class FavouriteBooksScreen extends StatelessWidget {
   final List<BookItem> favourites;

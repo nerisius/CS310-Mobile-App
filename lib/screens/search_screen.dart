@@ -1,20 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
-
-/// book model
-class BookItem {
-  final String title;
-  final String author;
-  final String? coverUrl; // opsiyonel
-  final String filePath;  // pdf/epub path ya da id
-
-  BookItem({
-    required this.title,
-    required this.author,
-    required this.filePath,
-    this.coverUrl,
-  });
-}
+import '../utils/app_colors.dart';
+import '../models/book_item.dart';
 
 class SearchScreen extends StatefulWidget {
   /// Import edilen pdf/epub kitapların listesi buradan gelecek.
