@@ -5,6 +5,7 @@ import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/signup.dart';
 import 'screens/stats/stats_screen.dart';
+import 'screens/settings_screen.dart';
 import 'utils/app_colors.dart';
 import 'utils/app_text_styles.dart';
 
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignScreen(),
         '/home': (context) => const MainScreen(),
         '/stats': (context) => const StatsScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }
