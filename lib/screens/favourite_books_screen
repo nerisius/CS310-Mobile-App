@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
+import 'profile_screen.dart'; // BookItem modelini buradan alıyoruz
+
+class FavouriteBooksScreen extends StatelessWidget {
+  final List<BookItem> favourites;
+
+  const FavouriteBooksScreen({super.key, required this.favourites});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FA),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+        iconTheme: IconThemeData(color: AppColors.accent),
+        title: const Text(
+          "Favourite Books",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+        ),
+        centerTitle: true,
+      ),
+      body: favourites.isEmpty
+          ? const Center(
+              child: Text("No favourites yet",
+                  style: TextStyle(color: Colors.grey)),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(14),
+              itemCount: favourites.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, i) {
+                final b = favourites[i];
+                return Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFEDEFF3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xFFF2F3F6),
+                        ),
+                        child: b.coverUrl == null
+                            ? Icon(Icons.menu_book,
+                                color: AppColors.accent, size: 28)
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(b.coverUrl!,
+                                    fit: BoxFit.cover),
+                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(b.title,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 4),
+                            Text(b.author,
+                                style: const TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.chevron_right, color: AppColors.accent),
+                    ],
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
