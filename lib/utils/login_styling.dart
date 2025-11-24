@@ -36,3 +36,4 @@ class AppPaddings {
   static const fieldSpacing = SizedBox(height: 5);
   static const buttonSpacing = SizedBox(height: 30);
 }
+
