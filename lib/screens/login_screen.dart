@@ -104,6 +104,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         await prefs.setBool('isLoggedIn', true);
                         Navigator.pushReplacementNamed(context, '/home');
                       }
+                      else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                          title: const Text("Error"),
+                          content: const Text("Please fill in all required fields."),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                          ),
+                        );
+                      }
                     },
                     child: const Text("Log In", style: AppTextStyles.buttonText),
                   ),
