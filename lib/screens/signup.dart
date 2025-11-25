@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
+import '../utils/app_text_styles.dart';
+import '../utils/app_spacing.dart';
 
 class SignScreen extends StatefulWidget {
   const SignScreen({super.key});
@@ -33,115 +36,183 @@ class _SignScreenState extends State<SignScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Sign Up"),
+        backgroundColor: AppColors.accent,
+        title: const Text(
+          "Sign Up",
+        ),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: AppSpacing.screenPadding,
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
 
                 const SizedBox(height: 20),
+                Image.asset(
+                  'lib/utils/circular_logo.png',
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 20),
+
+                Text(
+                  'Create your account and start your journey with us! 🪶',
+                  textAlign: TextAlign.center,
+                ),
+
+                AppSpacing.fieldSpacing,
 
                 // Username
                 TextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Username",
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   validator: (value) =>
                   value == null || value.isEmpty ? "Username is required" : null,
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.fieldSpacing,
 
                 // Email
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Email",
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   validator: (value) =>
                   value == null || value.isEmpty ? "Email is required" : null,
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.fieldSpacing,
 
-                // Date of Birth (date picker)
+                // Date of Birth
                 TextFormField(
                   controller: _dobController,
                   readOnly: true,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Date of Birth",
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    suffixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
                   ),
                   onTap: _selectDate,
                   validator: (value) =>
                   value == null || value.isEmpty ? "Date of birth required" : null,
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.fieldSpacing,
 
                 // Gender dropdown
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Gender",
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   items: const [
-                    DropdownMenuItem(
-                      value: "male",
-                      child: Text("Male"),
-                    ),
-                    DropdownMenuItem(
-                      value: "female",
-                      child: Text("Female"),
-                    ),
-                    DropdownMenuItem(
-                      value: "other",
-                      child: Text("Other"),
-                    ),
+                    DropdownMenuItem(value: "male", child: Text("Male")),
+                    DropdownMenuItem(value: "female", child: Text("Female")),
+                    DropdownMenuItem(value: "other", child: Text("Other")),
                   ],
                   onChanged: (value) {
                     setState(() {
-                      _selectedGender = value!;
+                      _selectedGender = value;
                     });
                   },
                   validator: (value) =>
                   value == null ? "Please select a gender" : null,
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.fieldSpacing,
 
                 // Password
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: "Password",
-                    border: OutlineInputBorder(),
-                  ),
                   obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   validator: (value) =>
                   value == null || value.isEmpty ? "Password is required" : null,
                 ),
 
-                const SizedBox(height: 30),
+                AppSpacing.buttonSpacing,
 
                 // Sign Up button
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Later: send to backend, create account, etc.
-                      Navigator.pushReplacementNamed(context, '/home');
-                    }
-                  },
-                  child: const Text("Create Account"),
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Error"),
+                            content: const Text(
+                                "Please fill in all required fields correctly."),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Create Account", style: AppTextStyles.buttonText),
+                  ),
                 ),
               ],
             ),
