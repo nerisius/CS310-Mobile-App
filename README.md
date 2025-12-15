@@ -236,3 +236,12 @@ flutter run
 - Google Books API integration
 - Real-time data updates
 - Security rules for Firestore
+
+### Project Structure
+```
+lib/
+├── models/      # Data models (Book, Post, AppUser)
+├── services/    # Firebase & API services
+├── providers/   # State management
+└── screens/     # UI screens
+```
