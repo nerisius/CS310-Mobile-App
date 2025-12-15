@@ -32,6 +32,24 @@
   <title>bookmate</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDr5fLqpno7X1B0jgA-X9lH6SZ81Klnkts",
+    authDomain: "bookmate-2c581.firebaseapp.com",
+    projectId: "bookmate-2c581",
+    storageBucket: "bookmate-2c581.firebasestorage.app",
+    messagingSenderId: "899625540994",
+    appId: "1:899625540994:web:595594a9f8df8d3619039b"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+
 <body>
   <script src="flutter_bootstrap.js" async></script>
 </body>

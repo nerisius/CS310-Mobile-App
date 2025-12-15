@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'stats/stats_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/books_provider.dart';
+import '../providers/posts_provider.dart';
 import '../utils/app_colors.dart';
-import 'library_screen.dart';
-import 'profile_screen.dart';
-import 'search_screen.dart';
-import '../models/book_item.dart';
 
+// Import all tab screens
+import 'home_screen.dart';
+import 'library_screen.dart';
+import 'search_screen.dart';
+import 'stats/stats_screen.dart';
+import 'profile_screen.dart';
+
+/// MainScreen - The main container with bottom navigation
+///
+/// This screen:
+/// 1. Initializes providers when user logs in
+/// 2. Contains 5 tabs: Home, Library, Search, Stats, Profile
+/// 3. Uses IndexedStack to keep tab state when switching
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -15,143 +26,114 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  // Current selected tab index
   int _currentIndex = 0;
 
-  // Sample books for search screen
-  final List<BookItem> _sampleBooks = [
-    BookItem(
-      title: 'The Midnight Library',
-      author: 'Matt Haig',
-      filePath: 'path1',
-      coverUrl: 'https://covers.openlibrary.org/b/id/10909258-L.jpg',
-    ),
-    BookItem(
-      title: 'Atomic Habits',
-      author: 'James Clear',
-      filePath: 'path2',
-      coverUrl: 'https://covers.openlibrary.org/b/id/10677662-L.jpg',
-    ),
-    BookItem(
-      title: 'Dune',
-      author: 'Frank Herbert',
-      filePath: 'path3',
-      coverUrl: 'https://covers.openlibrary.org/b/id/12583597-L.jpg',
-    ),
-    BookItem(
-      title: 'Sapiens',
-      author: 'Yuval Noah Harari',
-      filePath: 'path4',
-      coverUrl: 'https://covers.openlibrary.org/b/id/8503016-L.jpg',
-    ),
-    BookItem(
-      title: '1984',
-      author: 'George Orwell',
-      filePath: 'path5',
-      coverUrl: 'https://covers.openlibrary.org/b/id/7222246-L.jpg',
-    ),
-    BookItem(
-      title: 'To Kill a Mockingbird',
-      author: 'Harper Lee',
-      filePath: 'path6',
-      coverUrl: 'https://covers.openlibrary.org/b/id/8228691-L.jpg',
-    ),
-  ];
-
-  // List of screens for each tab
-  late final List<Widget> _screens = [
+  // List of tab screens
+  final List<Widget> _screens = [
     const HomeScreen(),
     const LibraryScreen(),
-    SearchScreen(books: _sampleBooks),
+    const SearchScreen(),
     const StatsScreen(),
     const ProfileScreen(),
   ];
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize providers after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeProviders();
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        selectedItemColor: AppColors.accent,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Library',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Stats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
-    );
+  /// Initialize providers with user data
+  /// Initialize providers with user data
+  void _initializeProviders() {
+    final authProvider = context.read<AuthProvider>();
+
+    // DON'T redirect - providers are already initialized in login_screen
+    // Just check if we need to initialize them again
+    final userId = authProvider.userId;
+    if (userId != null) {
+      final booksProvider = context.read<BooksProvider>();
+      final postsProvider = context.read<PostsProvider>();
+
+      // Only initialize if not already initialized
+      if (booksProvider.state == BooksState.initial) {
+        booksProvider.initForUser(userId);
+      }
+      if (postsProvider.state == PostsState.initial) {
+        postsProvider.setCurrentUserId(userId);
+        postsProvider.initPosts();
+      }
+    }
   }
-}
-
-// Placeholder screen for screens that haven't been implemented yet
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const PlaceholderScreen({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.accent,
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+      // IndexedStack keeps all tabs in memory
+      // So when you switch tabs, they don't reload
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.construction,
-              size: 64,
-              color: AppColors.grey,
+
+      // Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
-            const SizedBox(height: 16),
-            Text(
-              '$title Screen',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: AppColors.cardBackground,
+          selectedItemColor: AppColors.accent,
+          unselectedItemColor: AppColors.grey,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 12,
+          ),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Coming Soon',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.library_books_outlined),
+              activeIcon: Icon(Icons.library_books),
+              label: 'Library',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search_outlined),
+              activeIcon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              activeIcon: Icon(Icons.bar_chart),
+              label: 'Stats',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
             ),
           ],
         ),

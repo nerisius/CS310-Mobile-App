@@ -1,62 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/preferences_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
 
-class OnboardingScreen extends StatefulWidget{
+/// OnboardingScreen - Shows app introduction for first-time users
+///
+/// Features:
+/// - 6 pages explaining app features
+/// - Page indicator dots
+/// - Skip button
+/// - Next/Get Started button
+/// - Marks onboarding as complete when finished
+class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
-  @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
 
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>{
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
+  final PreferencesService _prefsService = PreferencesService();
   int _currentPage = 0;
 
+  // Onboarding pages content
   final List<Map<String, dynamic>> _pages = [
     {
       'title': 'Welcome to BookMate',
       'description': 'Your personal reading companion for tracking books, sharing progress, and discovering your next great read.',
       'icon': Icons.auto_stories,
-      'color': AppColors.accent,
     },
     {
       'title': 'Home Feed',
       'description': 'Share your reading journey with friends! Post updates, celebrate milestones, and get inspired by what others are reading.',
       'icon': Icons.home_rounded,
-      'color': AppColors.accent,
     },
     {
       'title': 'Library',
       'description': 'Organize your entire book collection in one place. Track your reading progress, mark favorites, and never lose track of what to read next.',
       'icon': Icons.library_books_rounded,
-      'color': AppColors.accent,
     },
     {
       'title': 'Search',
-      'description': 'Discover millions of books and find your next favorite. Search by title, author, or genre and add them to your reading list instantly.',
+      'description': 'Find books in your library quickly. Search by title or author and manage your reading list.',
       'icon': Icons.search_rounded,
-      'color': AppColors.accent,
     },
     {
       'title': 'Stats',
-      'description': 'Visualize your reading habits with beautiful charts. Track pages read, books completed, and watch your reading streak grow!',
+      'description': 'Visualize your reading habits with beautiful charts. Track pages read, books completed, and watch your progress grow!',
       'icon': Icons.bar_chart_rounded,
-      'color': AppColors.accent,
     },
     {
       'title': 'Profile',
-      'description': 'Showcase your reading personality. Earn rosettes for achievements, build your reading lists, and connect with fellow book lovers.',
+      'description': 'Showcase your reading personality. Earn rosettes for achievements, build your reading lists, and track your goals.',
       'icon': Icons.person_rounded,
-      'color': AppColors.accent,
     },
   ];
 
+  /// Finish onboarding and navigate to login
   Future<void> _finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isFirstTime', false);
-    Navigator.pushReplacementNamed(context, '/login');
+    await _prefsService.init();
+    await _prefsService.setFirstTimeDone();
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   @override
@@ -66,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button (top right)
+            // Skip Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Align(
@@ -84,13 +91,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
               ),
             ),
 
-            // Main PageView
+            // Page View
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: _pages.length,
                 onPageChanged: (index) {
-                  setState(() => _currentPage = index);
+                  setState(() {
+                    _currentPage = index;
+                  });
                 },
                 itemBuilder: (context, index) {
                   final page = _pages[index];
@@ -105,10 +114,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                           height: 120,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [
-                                AppColors.accent,
-                                AppColors.primary,
-                              ],
+                              colors: [AppColors.accent, AppColors.primary],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -127,6 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                             color: Colors.white,
                           ),
                         ),
+
                         const SizedBox(height: 50),
 
                         // Title
@@ -138,6 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                           ),
                           textAlign: TextAlign.center,
                         ),
+
                         const SizedBox(height: 20),
 
                         // Description
@@ -160,7 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
               ),
             ),
 
-            // Indicator dots
+            // Page Indicator Dots
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(_pages.length, (index) {
@@ -172,8 +180,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                   decoration: BoxDecoration(
                     gradient: _currentPage == index
                         ? LinearGradient(
-                            colors: [AppColors.accent, AppColors.primary],
-                          )
+                      colors: [AppColors.accent, AppColors.primary],
+                    )
                         : null,
                     color: _currentPage == index ? null : AppColors.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(10),
@@ -184,7 +192,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
 
             const SizedBox(height: 30),
 
-            // Next / Get Started button
+            // Next / Get Started Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
               child: ElevatedButton(
@@ -200,8 +208,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>{
                 ),
                 onPressed: () {
                   if (_currentPage == _pages.length - 1) {
+                    // Last page - finish onboarding
                     _finishOnboarding();
                   } else {
+                    // Go to next page
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
