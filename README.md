@@ -245,3 +245,9 @@ lib/
 ├── providers/   # State management
 └── screens/     # UI screens
 ```
+
+### Tech Stack
+- Flutter & Dart
+- Firebase Auth & Firestore
+- Provider for state management
+- SharedPreferences
