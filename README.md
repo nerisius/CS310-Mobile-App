@@ -251,3 +251,7 @@ lib/
 - Firebase Auth & Firestore
 - Provider for state management
 - SharedPreferences
+
+### Team
+- CS310 Mobile Application Development
+- Sabanci University - Fall 2025
