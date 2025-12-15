@@ -225,3 +225,10 @@ flutter run
 - [Flutter Documentation](https://docs.flutter.dev/)
 - [Dart Language Tour](https://dart.dev/guides/language/language-tour)
 - [Flutter Cookbook](https://docs.flutter.dev/cookbook)
+
+## Step 3: Firebase Backend & State Management
+
+### Features Implemented
+- Firebase Authentication (Sign up, Login, Logout)
+- Cloud Firestore Database
+- Provider State Management
