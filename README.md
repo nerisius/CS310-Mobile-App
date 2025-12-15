@@ -232,3 +232,7 @@ flutter run
 - Firebase Authentication (Sign up, Login, Logout)
 - Cloud Firestore Database
 - Provider State Management
+- SharedPreferences for local storage
+- Google Books API integration
+- Real-time data updates
+- Security rules for Firestore
