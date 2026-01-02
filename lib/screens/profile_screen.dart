@@ -36,20 +36,44 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserver {
   final PreferencesService _prefsService = PreferencesService();
   int _readingGoal = 5;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadReadingGoal();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // FIX Issue 4: Reload reading goal when app resumes or screen is revisited
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadReadingGoal();
+    }
+  }
+
+  // FIX Issue 4: Reload when returning to this screen
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _loadReadingGoal();
   }
 
   Future<void> _loadReadingGoal() async {
     await _prefsService.init();
     final goal = await _prefsService.getReadingGoal();
-    setState(() => _readingGoal = goal);
+    if (mounted && goal != _readingGoal) {
+      setState(() => _readingGoal = goal);
+    }
   }
 
   /// Generate rosettes based on user's achievements
@@ -91,18 +115,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
   }
 
+  // FIX Issue 4: Navigate to settings and reload goal when returning
+  Future<void> _navigateToSettings() async {
+    await Navigator.pushNamed(context, "/settings");
+    // Reload reading goal when returning from settings
+    _loadReadingGoal();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final booksProvider = context.watch<BooksProvider>();
 
-    // Calculate stats from books
+    // FIX Issue 3: Calculate finished books properly
+    // This now correctly counts books with status 'finished'
+    // INCLUDING those that were updated from 'reading' to 'finished'
     final totalFinished = booksProvider.finishedBooks.length;
     final totalReading = booksProvider.readingBooks.length;
     final totalPlanning = booksProvider.planningBooks.length;
     final favoriteBooks = booksProvider.favoriteBooks;
 
-    // Monthly progress
+    // Monthly progress - use finished books count
     final monthlyProgress = _readingGoal > 0
         ? (totalFinished / _readingGoal).clamp(0.0, 1.0)
         : 0.0;
@@ -124,7 +157,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: AppColors.accent),
-            onPressed: () => Navigator.pushNamed(context, "/settings"),
+            // FIX Issue 4: Use new navigation method
+            onPressed: _navigateToSettings,
           ),
         ],
       ),

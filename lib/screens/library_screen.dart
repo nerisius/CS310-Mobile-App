@@ -263,10 +263,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,          // Changed from 2 to 4 (more books per row)
-                        childAspectRatio: 0.55,     // Adjusted ratio
-                        crossAxisSpacing: 12,       // Smaller spacing
-                        mainAxisSpacing: 16,        // Smaller spacing
+                        crossAxisCount: 4,
+                        childAspectRatio: 0.55,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 16,
                       ),
                       itemCount: displayedBooks.length,
                       itemBuilder: (context, index) => _BookGridItem(
@@ -417,10 +417,14 @@ class _AddBookBottomSheetState extends State<_AddBookBottomSheet> {
     }
 
     final booksProvider = context.read<BooksProvider>();
+    final totalPages = int.tryParse(_pagesController.text) ?? 0;
+
     final success = await booksProvider.addBook(
       title: _titleController.text.trim(),
       author: _authorController.text.trim(),
-      totalPages: int.tryParse(_pagesController.text) ?? 0,
+      totalPages: totalPages,
+      // FIX: If finished, set readPages to totalPages (100%)
+      readPages: _selectedStatus == 'finished' ? totalPages : 0,
       status: _selectedStatus,
     );
 
@@ -955,6 +959,7 @@ class _BookGridItem extends StatelessWidget {
   }
 
   /// Show book details and update progress
+  /// FIX Issue 3: Auto-update status to 'finished' when pages read = total pages
   void _showBookDetailsDialog(BuildContext context, Book book) {
     final pagesController = TextEditingController(text: book.readPages.toString());
 
@@ -987,6 +992,7 @@ class _BookGridItem extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Update pages read',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  helperText: 'Enter ${book.totalPages} to mark as finished',
                 ),
               ),
               const SizedBox(height: 16),
@@ -996,15 +1002,31 @@ class _BookGridItem extends StatelessWidget {
                   minimumSize: const Size.fromHeight(50),
                 ),
                 onPressed: () async {
+                  final booksProvider = context.read<BooksProvider>();
                   final newPages = int.tryParse(pagesController.text) ?? book.readPages;
-                  await context.read<BooksProvider>().updateProgress(book.id!, newPages);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Progress updated!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+
+                  // Update pages
+                  await booksProvider.updateProgress(book.id!, newPages);
+
+                  // FIX Issue 3: Auto-update status to 'finished' when 100% complete
+                  if (newPages >= book.totalPages && book.totalPages > 0 && book.status != 'finished') {
+                    await booksProvider.updateStatus(book.id!, 'finished');
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('🎉 Congratulations! Book marked as finished!'),
+                        backgroundColor: AppColors.success,
+                      ),
+                    );
+                  } else {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Progress updated!'),
+                        backgroundColor: AppColors.success,
+                      ),
+                    );
+                  }
                 },
                 child: const Text('Update Progress', style: TextStyle(color: Colors.white)),
               ),

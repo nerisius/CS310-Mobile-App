@@ -2,16 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/book.dart';
 import '../models/post.dart';
 import '../models/app_user.dart';
+import '../models/comment.dart';
 
 /// FirestoreService - Handles all Firestore database operations (CRUD)
 ///
 /// CRUD means:
-/// - Create: Add new data (addBook, addPost)
-/// - Read: Get data (getBooksStream, getPostsStream)
+/// - Create: Add new data (addBook, addPost, addComment)
+/// - Read: Get data (getBooksStream, getPostsStream, getCommentsStream)
 /// - Update: Modify data (updateBook, updateBookProgress)
-/// - Delete: Remove data (deleteBook, deletePost)
+/// - Delete: Remove data (deleteBook, deletePost, deleteComment)
 ///
-/// This service handles books, posts, and user data
+/// This service handles books, posts, comments, and user data
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -20,9 +21,6 @@ class FirestoreService {
   // Each user has their own collection of books
 
   /// Get real-time stream of user's books
-  ///
-  /// Stream means: whenever data changes in Firebase,
-  /// the app automatically gets the new data
   Stream<List<Book>> getBooksStream(String userId) {
     return _firestore
         .collection('users')
@@ -57,7 +55,6 @@ class FirestoreService {
   }
 
   /// Add a new book to user's library (CREATE)
-  /// Returns the new book's document ID
   Future<String> addBook(String userId, Book book) async {
     final docRef = await _firestore
         .collection('users')
@@ -161,6 +158,16 @@ class FirestoreService {
 
   /// Delete a post (DELETE)
   Future<void> deletePost(String postId) async {
+    // Also delete all comments for this post
+    final comments = await _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .get();
+
+    for (var doc in comments.docs) {
+      await doc.reference.delete();
+    }
+
     await _firestore.collection('posts').doc(postId).delete();
   }
 
@@ -175,6 +182,52 @@ class FirestoreService {
   Future<void> unlikePost(String postId, String userId) async {
     await _firestore.collection('posts').doc(postId).update({
       'likes': FieldValue.arrayRemove([userId]),
+    });
+  }
+
+  // ==================== COMMENTS ====================
+  // Comments are stored in: comments/{commentId}
+  // Each comment has a postId to link it to its post
+
+  /// Get real-time stream of comments for a specific post
+  Stream<List<Comment>> getCommentsStream(String postId) {
+    return _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt', descending: false) // Oldest first
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList());
+  }
+
+  /// Get comment count for a post
+  Future<int> getCommentCount(String postId) async {
+    final snapshot = await _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .count()
+        .get();
+    return snapshot.count ?? 0;
+  }
+
+  /// Add a new comment (CREATE)
+  Future<String> addComment(Comment comment) async {
+    final docRef = await _firestore.collection('comments').add(comment.toFirestore());
+
+    // Update comment count on the post
+    await _firestore.collection('posts').doc(comment.postId).update({
+      'commentCount': FieldValue.increment(1),
+    });
+
+    return docRef.id;
+  }
+
+  /// Delete a comment (DELETE)
+  Future<void> deleteComment(String commentId, String postId) async {
+    await _firestore.collection('comments').doc(commentId).delete();
+
+    // Update comment count on the post
+    await _firestore.collection('posts').doc(postId).update({
+      'commentCount': FieldValue.increment(-1),
     });
   }
 
