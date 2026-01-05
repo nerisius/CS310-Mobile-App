@@ -108,7 +108,7 @@ class AuthProvider extends ChangeNotifier {
         await _prefsService.setUsername(_appUser!.username);
       }
     } catch (e) {
-      print('Error fetching user profile: $e');
+      // Error fetching user profile
     }
   }
 
@@ -199,7 +199,7 @@ class AuthProvider extends ChangeNotifier {
       await _prefsService.clearUserData();
       // Auth state listener will handle updating the state
     } catch (e) {
-      print('Error signing out: $e');
+      // Error during sign out
     }
   }
 
@@ -212,7 +212,7 @@ class AuthProvider extends ChangeNotifier {
       _appUser = updatedUser;
       notifyListeners();
     } catch (e) {
-      print('Error updating profile: $e');
+      // Error updating profile
     }
   }
 

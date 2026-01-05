@@ -36,6 +36,10 @@ dev_dependencies:
   # encourage good coding practices.
   flutter_lints: ^5.0.0
 
+  # Testing dependencies for mocking and code generation
+  mockito: ^5.4.4
+  build_runner: ^2.4.13
+
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true

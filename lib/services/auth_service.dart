@@ -101,7 +101,6 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Error getting user profile: $e');
       return null;
     }
   }

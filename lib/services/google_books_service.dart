@@ -99,11 +99,9 @@ class GoogleBooksService {
         final List<dynamic> items = data['items'];
         return items.map((item) => GoogleBook.fromJson(item)).toList();
       } else {
-        print('Google Books API error: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Error searching books: $e');
       return [];
     }
   }
@@ -133,11 +131,9 @@ class GoogleBooksService {
         final data = json.decode(response.body);
         return GoogleBook.fromJson(data);
       } else {
-        print('Error getting book: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error getting book by ID: $e');
       return null;
     }
   }

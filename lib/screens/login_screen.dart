@@ -47,8 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      print('Login successful! User ID: ${authProvider.userId}');
-
       // Initialize providers BEFORE navigating
       final userId = authProvider.userId;
       if (userId != null) {

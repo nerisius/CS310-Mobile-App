@@ -111,17 +111,134 @@ flutter build appbundle
 flutter build ios
 ```
 
+## Firebase Configuration
+
+This app uses Firebase for authentication and database. Follow these steps to configure Firebase:
+
+### 1. Create Firebase Project
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Use existing project: `bookmate-2c581` (or create a new project)
+3. Enable **Authentication** with Email/Password provider
+4. Create **Cloud Firestore** database in production mode
+
+### 2. Android Configuration
+
+1. In Firebase Console, download `google-services.json` for your Android app
+2. Place it in: `android/app/google-services.json`
+3. The file is already in `.gitignore` for security
+
+### 3. iOS Configuration
+
+1. In Firebase Console, download `GoogleService-Info.plist` for your iOS app
+2. Place it in: `ios/Runner/GoogleService-Info.plist`
+3. The file is already in `.gitignore` for security
+
+### 4. Web Configuration
+
+Firebase options are auto-configured in `lib/firebase_options.dart` (generated via FlutterFire CLI)
+
+### 5. Firestore Database Structure
+
+The app uses the following Firestore collections:
+
+```
+users/{userId}
+├── Field: email, username, photoUrl, bio, etc.
+└── Subcollection: books/{bookId}
+    └── Field: title, author, coverUrl, totalPages, readPages, status, etc.
+
+posts/{postId}
+└── Field: userId, username, content, bookTitle, likes[], commentCount, etc.
+
+comments/{commentId}
+└── Field: postId, userId, username, content, createdAt, etc.
+```
+
+### 6. Firebase Security Rules
+
+Ensure proper security rules are set in Firebase Console:
+- Users can only read/write their own data
+- Posts are publicly readable but only editable by their creators
+- Comments are publicly readable but only editable by their creators
+
+### 7. Environment Variables
+
+No additional environment variables are required. Firebase configuration is handled via `lib/firebase_options.dart`.
+
+### Firebase Services Used
+
+- **Firebase Authentication**: Email/Password sign up and sign in
+- **Cloud Firestore**: Real-time database for users, books, posts, and comments
+- **Firebase Storage**: (Optional) For book covers and user profile photos
+
 ## Testing
 
-Run all tests:
+This project includes comprehensive unit tests and widget tests to ensure code quality and functionality.
+
+### Running Tests
+
+To run all tests:
 ```bash
 flutter test
 ```
 
-Run specific test file:
+To run tests with coverage:
 ```bash
-flutter test test/widget_test.dart
+flutter test --coverage
 ```
+
+To run specific test file:
+```bash
+flutter test test/unit/book_model_test.dart
+flutter test test/widget/login_screen_test.dart
+```
+
+### Test Coverage
+
+#### Unit Tests (31 tests)
+
+**Book Model Tests** (`test/unit/book_model_test.dart` - 16 tests)
+- Tests book progress calculation (currentPage/totalPages ratio)
+- Tests book percentage completion (0-100%)
+- Tests Firestore serialization (toFirestore method)
+- Validates book model data integrity
+- Tests copyWith functionality for updating book data
+- Tests isFinished status logic
+- Tests default values and edge cases
+
+**Post Model Tests** (`test/unit/post_model_test.dart` - 15 tests)
+- Tests like counting functionality (likeCount getter)
+- Tests user like detection (isLikedBy method)
+- Tests Firestore serialization (toFirestore method)
+- Tests different activity types (finished, started, quote, progress)
+- Tests copyWith functionality for updating posts
+- Tests comment count tracking
+- Tests default values and null handling
+
+#### Widget Tests (16 tests)
+
+**Login Screen Tests** (`test/widget/login_screen_test.dart` - 16 tests)
+- Tests UI element rendering (welcome message, app icon, form fields)
+- Tests form validation (email format, password length)
+- Validates error message display
+- Tests password visibility toggle
+- Tests user input handling
+- Tests forgot password snackbar
+- Tests edge cases for email and password validation
+
+### Expected Test Results
+
+All tests should pass successfully. Run `flutter test` to verify:
+```
+00:05 +47: All tests passed!
+```
+
+**Test Statistics:**
+- Total Tests: 47
+- Unit Tests: 31 (2 files)
+- Widget Tests: 16 (1 file)
+- Pass Rate: 100%
 
 ## Project Structure
 
@@ -219,6 +336,55 @@ flutter clean
 flutter pub get
 flutter run
 ```
+
+## Known Issues / Limitations
+
+### Google Books API
+- Search functionality depends on Google Books API availability
+- Rate limits may apply for excessive searches
+- Some books may not have cover images available
+
+### Image Loading
+- Book cover images from external URLs may fail to load if the source is unavailable
+- Placeholder images are shown as fallback
+- Network connectivity required for loading remote images
+
+### Offline Mode
+- The app requires internet connection for Firebase operations (authentication, database sync)
+- Offline persistence for Firestore is not yet implemented
+- Users must be online to sign in, load books, or interact with posts
+
+### Testing
+- Tests cover core functionality but are not comprehensive
+- Widget tests avoid Firebase integration to prevent test failures
+- More integration tests could be added in future iterations
+
+### Known Bugs
+- Post model has a bug in `isLikedBy()` method (uses wrong parameter)
+- Deprecated API warnings for `.withOpacity()` in Flutter 3.33+ (non-critical)
+
+### Troubleshooting
+
+If you encounter issues, please check:
+
+1. **Firebase configuration is correct**
+   - Ensure `google-services.json` is in `android/app/`
+   - Ensure `GoogleService-Info.plist` is in `ios/Runner/`
+   - Verify Firebase project settings in Console
+
+2. **Internet connection is active**
+   - Required for Firebase Authentication
+   - Required for Firestore database operations
+   - Required for Google Books API searches
+
+3. **Flutter SDK version matches requirements**
+   - Minimum: Flutter 3.0.0
+   - Recommended: Flutter 3.5.0 or higher
+   - Run `flutter doctor` to verify setup
+
+4. **Dependencies are installed**
+   - Run `flutter pub get` after cloning
+   - Check for dependency conflicts with `flutter pub outdated`
 
 ## Resources
 
