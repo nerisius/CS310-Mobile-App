@@ -2,7 +2,7 @@
 
 A Flutter mobile application for book tracking and social reading. Users can share their reading progress, discover what others are reading, and maintain their personal book library.
 
-**Course Project:** CS310 - Phase 2.2
+**Course Project:** CS310 - Project Step 4
 **Tech Stack:** Flutter, Dart
 
 ## Current Features
