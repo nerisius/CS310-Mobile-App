@@ -1,52 +1,147 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
-import 'favourite_books_screen.dart';
-import '../models/book_item.dart';
+import '../providers/auth_provider.dart';
+import '../providers/books_provider.dart';
+import '../models/book.dart';
+import '../services/preferences_service.dart';
 
-/// Rosette/Badge modeli 
+/// Rosette/Badge model
 class RosetteItem {
   final String title;
   final IconData icon;
   final Color bg;
+  final bool unlocked;
 
-  RosetteItem({required this.title, required this.icon, required this.bg});
+  RosetteItem({
+    required this.title,
+    required this.icon,
+    required this.bg,
+    this.unlocked = false,
+  });
 }
 
-class ProfileScreen extends StatelessWidget {
+/// ProfileScreen - Displays user profile with data from Firestore
+///
+/// Features:
+/// - User info from Firebase Auth
+/// - Reading stats from books collection
+/// - Achievement rosettes
+/// - Favorite books
+/// - Monthly reading goal progress
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserver {
+  final PreferencesService _prefsService = PreferencesService();
+  int _readingGoal = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadReadingGoal();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // FIX Issue 4: Reload reading goal when app resumes or screen is revisited
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadReadingGoal();
+    }
+  }
+
+  // FIX Issue 4: Reload when returning to this screen
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadReadingGoal();
+  }
+
+  Future<void> _loadReadingGoal() async {
+    await _prefsService.init();
+    final goal = await _prefsService.getReadingGoal();
+    if (mounted && goal != _readingGoal) {
+      setState(() => _readingGoal = goal);
+    }
+  }
+
+  /// Generate rosettes based on user's achievements
+  List<RosetteItem> _generateRosettes(BooksProvider booksProvider) {
+    final finished = booksProvider.finishedBooks.length;
+    final totalBooks = booksProvider.books.length;
+
+    return [
+      RosetteItem(
+        title: "1st Book",
+        icon: Icons.auto_stories,
+        bg: const Color(0xFFFFEFE6),
+        unlocked: finished >= 1,
+      ),
+      RosetteItem(
+        title: "5 Books",
+        icon: Icons.library_books,
+        bg: const Color(0xFFFFF2F2),
+        unlocked: finished >= 5,
+      ),
+      RosetteItem(
+        title: "Collector",
+        icon: Icons.collections_bookmark,
+        bg: const Color(0xFFEFF4FF),
+        unlocked: totalBooks >= 10,
+      ),
+      RosetteItem(
+        title: "Bookworm",
+        icon: Icons.menu_book,
+        bg: const Color(0xFFEFFFF6),
+        unlocked: finished >= 10,
+      ),
+      RosetteItem(
+        title: "Explorer",
+        icon: Icons.explore,
+        bg: const Color(0xFFFFFBE6),
+        unlocked: booksProvider.favoriteBooks.length >= 3,
+      ),
+    ];
+  }
+
+  // FIX Issue 4: Navigate to settings and reload goal when returning
+  Future<void> _navigateToSettings() async {
+    await Navigator.pushNamed(context, "/settings");
+    // Reload reading goal when returning from settings
+    _loadReadingGoal();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // ===== dummy user data =====
-    const String username = "Ardıl"; // profil foto altında isim
-    const String bio =
-        "Electronics & Communication Eng. student.\nCaving, bouldering, metal & folk music.";
+    final authProvider = context.watch<AuthProvider>();
+    final booksProvider = context.watch<BooksProvider>();
 
-    const int readHistory = 12;
-    const int readingNow = 3;
-    const int wantToRead = 25;
+    // FIX Issue 3: Calculate finished books properly
+    // This now correctly counts books with status 'finished'
+    // INCLUDING those that were updated from 'reading' to 'finished'
+    final totalFinished = booksProvider.finishedBooks.length;
+    final totalReading = booksProvider.readingBooks.length;
+    final totalPlanning = booksProvider.planningBooks.length;
+    final favoriteBooks = booksProvider.favoriteBooks;
 
-    // monthly goal
-    const int monthlyGoalTarget = 5;
-    const int monthlyGoalDone = 2;
-    final double monthlyProgress =
-        monthlyGoalTarget == 0 ? 0 : monthlyGoalDone / monthlyGoalTarget;
+    // Monthly progress - use finished books count
+    final monthlyProgress = _readingGoal > 0
+        ? (totalFinished / _readingGoal).clamp(0.0, 1.0)
+        : 0.0;
 
-    // rosettes dummy
-    final rosettes = <RosetteItem>[
-      RosetteItem(title: "1st Book", icon: Icons.auto_stories, bg: const Color(0xFFFFEFE6)),
-      RosetteItem(title: "3-Day Streak", icon: Icons.local_fire_department, bg: const Color(0xFFFFF2F2)),
-      RosetteItem(title: "Night Owl", icon: Icons.nightlight_round, bg: const Color(0xFFEFF4FF)),
-      RosetteItem(title: "Explorer", icon: Icons.explore, bg: const Color(0xFFEFFFF6)),
-    ];
-
-    // favourite books dummy
-    final favourites = <BookItem>[
-      BookItem(title: "Atomic Habits", author: "James Clear", filePath: "x"),
-      BookItem(title: "The Midnight Library", author: "Matt Haig", filePath: "y"),
-      BookItem(title: "Dune", author: "Frank Herbert", filePath: "z"),
-      BookItem(title: "Sapiens", author: "Yuval N. Harari", filePath: "w"),
-    ];
+    // Generate rosettes
+    final rosettes = _generateRosettes(booksProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
@@ -62,48 +157,67 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: AppColors.accent),
-            onPressed: () { 
-              Navigator.pushNamed(context, "/settings");
-            },
+            // FIX Issue 4: Use new navigation method
+            onPressed: _navigateToSettings,
           ),
         ],
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 24),
         child: Column(
           children: [
             const SizedBox(height: 8),
 
-            // ========== Profile header card ==========
+            // Profile Header Card
             _Card(
               child: Column(
                 children: [
-                  const CircleAvatar(
+                  // Avatar
+                  CircleAvatar(
                     radius: 48,
-                    backgroundColor: Color(0xFFEDEFF3),
-                    child: Icon(Icons.person, size: 60, color: Colors.grey),
-                    // TODO: real image:
-                    // backgroundImage: NetworkImage(user.photoUrl),
+                    backgroundColor: AppColors.accent,
+                    child: Text(
+                      authProvider.username.isNotEmpty
+                          ? authProvider.username[0].toUpperCase()
+                          : 'U',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    username,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+
+                  // Username
+                  Text(
+                    authProvider.username,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 6),
+
+                  // Email
                   Text(
-                    bio,
-                    textAlign: TextAlign.center,
+                    authProvider.firebaseUser?.email ?? '',
                     style: const TextStyle(fontSize: 13, color: Colors.black54),
                   ),
+
+                  // Bio
+                  if (authProvider.appUser?.bio != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      authProvider.appUser!.bio!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                  ],
                 ],
               ),
             ),
 
             const SizedBox(height: 12),
 
-            // ========== Rosettes / Badges ==========
+            // Rosettes / Badges
             _Card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,28 +232,35 @@ class ProfileScreen extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(width: 10),
                       itemBuilder: (context, i) {
                         final r = rosettes[i];
-                        return Container(
-                          width: 120,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: r.bg,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE1E3E8)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(r.icon, color: AppColors.accent),
-                              const SizedBox(height: 6),
-                              Text(
-                                r.title,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                        return Opacity(
+                          opacity: r.unlocked ? 1.0 : 0.4,
+                          child: Container(
+                            width: 100,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: r.bg,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFFE1E3E8)),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  r.icon,
+                                  color: r.unlocked ? AppColors.accent : Colors.grey,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 6),
+                                Text(
+                                  r.title,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: r.unlocked ? Colors.black : Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -151,34 +272,29 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // ========== Stats row ==========
+            // Stats Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: Row(
                 children: [
                   Expanded(
                     child: _MiniStatChip(
-                      label: "Read\nHistory",
-                      value: readHistory.toString(),
-                      onTap: () {
-                        // TODO: history page
-                      },
+                      label: "Finished",
+                      value: totalFinished.toString(),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: _MiniStatChip(
                       label: "Reading",
-                      value: readingNow.toString(),
-                      onTap: () {},
+                      value: totalReading.toString(),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: _MiniStatChip(
                       label: "Want\nto Read",
-                      value: wantToRead.toString(),
-                      onTap: () {},
+                      value: totalPlanning.toString(),
                     ),
                   ),
                 ],
@@ -187,7 +303,7 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // ========== Favourite books preview ==========
+            // Favourite Books
             _Card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,43 +311,40 @@ class ProfileScreen extends StatelessWidget {
                   Row(
                     children: [
                       const Expanded(child: _SectionTitle("Favourite Books")),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  FavouriteBooksScreen(favourites: favourites),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          "See all",
-                          style: TextStyle(color: AppColors.accent),
-                        ),
-                      )
+                      Text(
+                        "${favoriteBooks.length} books",
+                        style: TextStyle(color: AppColors.accent, fontSize: 12),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 150,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: favourites.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, i) {
-                        final b = favourites[i];
-                        return _BookThumb(book: b);
-                      },
+                  if (favoriteBooks.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: Text(
+                          "No favourite books yet",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      height: 150,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: favoriteBooks.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (context, i) => _BookThumb(book: favoriteBooks[i]),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 12),
 
-            // ========== Monthly Reading Goal ==========
+            // Monthly Reading Goal
             _Card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,16 +354,15 @@ class ProfileScreen extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "$monthlyGoalDone / $monthlyGoalTarget books",
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w700),
+                        "$totalFinished / $_readingGoal books",
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
-                            value: monthlyProgress.clamp(0, 1),
+                            value: monthlyProgress,
                             minHeight: 10,
                             backgroundColor: const Color(0xFFEDEFF3),
                             color: AppColors.accent,
@@ -261,7 +373,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    monthlyGoalDone >= monthlyGoalTarget
+                    totalFinished >= _readingGoal
                         ? "Goal completed! 🎉"
                         : "Keep reading to reach your goal!",
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -276,8 +388,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-/// UI helpers  
-
+/// Card wrapper widget
 class _Card extends StatelessWidget {
   final Widget child;
   const _Card({required this.child});
@@ -306,6 +417,7 @@ class _Card extends StatelessWidget {
   }
 }
 
+/// Section title widget
 class _SectionTitle extends StatelessWidget {
   final String text;
   const _SectionTitle(this.text);
@@ -319,54 +431,47 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+/// Mini stat chip widget
 class _MiniStatChip extends StatelessWidget {
   final String label;
   final String value;
-  final VoidCallback onTap;
 
-  const _MiniStatChip({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
+  const _MiniStatChip({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFEDEFF3)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.accent,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEDEFF3)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: AppColors.accent,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 11, color: Colors.black87),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 11, color: Colors.black87),
+          ),
+        ],
       ),
     );
   }
 }
 
+/// Book thumbnail widget
 class _BookThumb extends StatelessWidget {
-  final BookItem book;
+  final Book book;
   const _BookThumb({required this.book});
 
   @override
@@ -380,19 +485,26 @@ class _BookThumb extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Cover
           Expanded(
-            child: book.coverUrl == null
-                ? Center(
-                    child: Icon(Icons.menu_book,
-                        color: AppColors.accent, size: 36),
-                  )
-                : ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: Image.network(book.coverUrl!,
-                        width: double.infinity, fit: BoxFit.cover),
-                  ),
+            child: book.coverUrl != null
+                ? ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.network(
+                book.coverUrl!,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Icon(Icons.menu_book, color: AppColors.accent, size: 36),
+                ),
+              ),
+            )
+                : Center(
+              child: Icon(Icons.menu_book, color: AppColors.accent, size: 36),
+            ),
           ),
+
+          // Info
           Container(
             padding: const EdgeInsets.all(8),
             width: double.infinity,
@@ -407,8 +519,7 @@ class _BookThumb extends StatelessWidget {
                   book.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -419,7 +530,7 @@ class _BookThumb extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

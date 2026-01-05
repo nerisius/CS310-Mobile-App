@@ -225,3 +225,33 @@ flutter run
 - [Flutter Documentation](https://docs.flutter.dev/)
 - [Dart Language Tour](https://dart.dev/guides/language/language-tour)
 - [Flutter Cookbook](https://docs.flutter.dev/cookbook)
+
+## Step 3: Firebase Backend & State Management
+
+### Features Implemented
+- Firebase Authentication (Sign up, Login, Logout)
+- Cloud Firestore Database
+- Provider State Management
+- SharedPreferences for local storage
+- Google Books API integration
+- Real-time data updates
+- Security rules for Firestore
+
+### Project Structure
+```
+lib/
+├── models/      # Data models (Book, Post, AppUser)
+├── services/    # Firebase & API services
+├── providers/   # State management
+└── screens/     # UI screens
+```
+
+### Tech Stack
+- Flutter & Dart
+- Firebase Auth & Firestore
+- Provider for state management
+- SharedPreferences
+
+### Team
+- CS310 Mobile Application Development
+- Sabanci University - Fall 2025
